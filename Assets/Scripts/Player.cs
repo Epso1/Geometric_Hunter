@@ -4,36 +4,28 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private Rigidbody2D rb2D;
-    private float horizMove;
-    private float vertMove;
-    [SerializeField] private float horizontalSpeed = 20f;  
-    [SerializeField] private float verticalShift = 2f;
-    [SerializeField] GameObject[] bullets;
-    [SerializeField] Transform shotOrigin;
-    [SerializeField] private float horizontalLimit = 7f;
-    [SerializeField] private float verticalLimit = 4f;
-    private bool canMoveVertical = true;
-    private bool canShoot= true;
+    [SerializeField] private GameObject[] bullets;
+    [SerializeField] private Transform shotOrigin;
+    private bool canShoot = true;
+    private GameController gameController;
 
-
-    private void Awake()
+    public bool CanShoot
     {
-        rb2D = GetComponent<Rigidbody2D>();
+        get => canShoot;
+        set => canShoot = value;
     }
+   
     void Start()
     {
-       
+       gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+       canShoot = true;
     }
 
     void Update()
     {
-       
-      
         // SHOOT INPUTS
         if (canShoot)
         {
-
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetButtonDown("Jump"))
             {
                 StartCoroutine(Shoot(0));
@@ -51,7 +43,6 @@ public class Player : MonoBehaviour
                 StartCoroutine(Shoot(3));
             }
         }
-       
     }
 
 
@@ -59,7 +50,26 @@ public class Player : MonoBehaviour
     {
         canShoot = false;
         Instantiate(bullets[bulletIndex], shotOrigin.position, bullets[bulletIndex].transform.rotation);
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(.05f);
         canShoot = true;
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            StartCoroutine(PlayerDies());
+        }
+    }
+
+    private IEnumerator PlayerDies()
+    {
+        yield return new WaitForSeconds(0.01f);
+
+        canShoot = false;
+        gameController.Score += 10;
+        gameController.StartCoroutine(gameController.ReloadScene());
+
+        Destroy(gameObject);      
+    } 
 }
