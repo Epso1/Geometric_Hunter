@@ -6,8 +6,8 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject[] bullets;
     [SerializeField] private Transform shotOrigin;
-    private bool canShoot = true;
     private GameController gameController;
+    private bool canShoot = true;
 
     public bool CanShoot
     {
@@ -17,8 +17,8 @@ public class Player : MonoBehaviour
    
     void Start()
     {
-       gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
-       canShoot = true;
+        canShoot = true;
+        gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
     }
 
     void Update()
@@ -65,9 +65,8 @@ public class Player : MonoBehaviour
     private IEnumerator PlayerDies()
     {
         yield return new WaitForSeconds(0.01f);
-
+        
         canShoot = false;
-        gameController.Score += 10;
         gameController.StartCoroutine(gameController.ReloadScene());
 
         Destroy(gameObject);      

@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
     [SerializeField] private float speed = 40f;
+    private Vector3 direction;
+    void Start()
+    {
+        direction = Vector3.right;
+    }
 
     void Update()
     {
         // Mueve la bala hacia adelante
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        transform.Translate(direction * speed * Time.deltaTime);
     }
 
     // Se llama cuando el objeto se vuelve invisible para la cámara
@@ -17,5 +23,11 @@ public class Bullet : MonoBehaviour
     {
         // Destruye el objeto
         Destroy(gameObject);
+    }
+
+   
+    public void SetDirection(Vector3 direction)
+    {
+        this.direction = direction;
     }
 }

@@ -23,7 +23,6 @@ public class EnemiesCreator : MonoBehaviour
 
     IEnumerator CreateEnemies()
     {
-        Debug.Log("Creating enemies");
         yield return new WaitForSeconds(initialWait);
         for (int i = 0; i < enemyQuantity; i++)
         {

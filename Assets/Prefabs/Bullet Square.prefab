@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 26855865903725277}
   m_Layer: 0
   m_Name: Bullet Square
-  m_TagString: Bullet
+  m_TagString: SquareBullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -126,7 +126,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &26855865903725277
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -156,7 +156,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

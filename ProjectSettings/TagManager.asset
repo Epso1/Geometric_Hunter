@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Bullet
   - Enemy
+  - ScoreText
+  - CircleBullet
+  - SquareBullet
+  - TriangleBullet
+  - DiamondBullet
   layers:
   - Default
   - TransparentFX

@@ -3,48 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
-    private int score = 0;
 
-    public int Score
-    {
-        get => score;
-        set => score = value;
-    }
-    // Crea un singleton para que el GameController no se destruya al cambiar de escena
-    private static GameController instance;
-    public static GameController Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<GameController>();
-                if (instance == null)
-                {
-                    instance = new GameObject("GameController").AddComponent<GameController>();
-                }
-            }
-            return instance;
-        }
-    }
-    void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    } 
-
-   
     void Start()
     {
         
@@ -52,16 +16,27 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("SCORE: " + score);
-        scoreText.text = "SCORE: " + score;
+       // actualiza el texto del score con el valor actual del score
+        scoreText.text = "SCORE: " + ScoreManager.Instance.Score;
+    }
+
+    private int GetActiveSceneIndex()
+    {
+        return SceneManager.GetActiveScene().buildIndex;
+    }
+ 
+    public IEnumerator LoadNextScene()
+    {
+        yield return new WaitForSeconds(1f);
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex + 1);
     }
 
     public IEnumerator ReloadScene()
     {
-        Debug.Log("Reloading scene");
-        // Espera 2 segundos
         yield return new WaitForSeconds(1f);
-        // Recarga la escena actual
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        scoreText = GameObject.FindWithTag("ScoreText").GetComponent<TextMeshProUGUI>();
     }
+
 }
