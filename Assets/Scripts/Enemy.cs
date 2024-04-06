@@ -1,14 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    private float speed = 10f;
+    [SerializeField] private float speed = 10f;
     public enum enemyType { Triangle, Square, Circle, Diamond };
     [SerializeField] private enemyType type;
     [SerializeField] private int pointsRight = 10;
     [SerializeField] private int pointsWrong = 5;
+    private Animator anim;
+    private Rigidbody2D rb2D;
+
 
     public float Speed
     {
@@ -16,9 +20,18 @@ public class Enemy : MonoBehaviour
         set => speed = value;
     }
 
-    void Update()
+    void Start()
     {
-        transform.Translate(Vector3.left * speed * Time.deltaTime);
+        rb2D = gameObject.GetComponent<Rigidbody2D>();
+        anim = gameObject.GetComponent<Animator>();
+        anim.SetFloat("Speed", speed / 10);
+    }
+
+    void FixedUpdate()
+    {
+        Vector2 velocity = new Vector2(speed, 0);
+        rb2D.MovePosition(rb2D.position - velocity * Time.fixedDeltaTime);
+        //transform.Translate(Vector3.left * speed * Time.deltaTime);
     }
 
     void OnTriggerEnter2D(Collider2D other)

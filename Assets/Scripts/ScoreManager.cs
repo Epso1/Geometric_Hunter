@@ -9,11 +9,20 @@ public class ScoreManager : MonoBehaviour
     public static ScoreManager Instance;
 
     private int score = 0;
+ 
 
     public int Score
     {
         get => score;
         set => score = value;
+    }
+
+    private int hiScore = 50;
+
+    public int HiScore
+    {
+        get => hiScore;
+        set => hiScore = value;
     }
 
     void Awake()
@@ -40,6 +49,11 @@ public class ScoreManager : MonoBehaviour
         if (score < 0)
         {
             score = 0;
+        }
+        
+        if (score > hiScore) 
+        {
+            hiScore = score;
         }
     }
 }
