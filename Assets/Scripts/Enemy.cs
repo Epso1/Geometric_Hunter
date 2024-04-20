@@ -12,6 +12,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int pointsWrong = 5;
     private Animator anim;
     private Rigidbody2D rb2D;
+    private GameController gameController;
 
 
     public float Speed
@@ -22,6 +23,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         rb2D = gameObject.GetComponent<Rigidbody2D>();
         anim = gameObject.GetComponent<Animator>();
         anim.SetFloat("Speed", speed / 10);
@@ -40,12 +42,14 @@ public class Enemy : MonoBehaviour
         {
             if (other.tag.Contains(type.ToString()))
             {
+                gameController.PlayGoodShot();
                 ScoreManager.Instance.Score += pointsRight;
                 Destroy(other.gameObject);
                 Destroy(gameObject);
             }
             else
             {
+                gameController.PlayBadShot();
                 other.gameObject.GetComponent<Bullet>().SetDirection(Vector3.down);
                 ScoreManager.Instance.Score -= pointsWrong;
             }

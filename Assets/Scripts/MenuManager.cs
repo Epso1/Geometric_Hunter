@@ -6,7 +6,9 @@ using TMPro;
 using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
-{
+{   
+    [SerializeField] private string startingSceneName = "Scene01";
+
     public void StartGameButton()
     {
         StartCoroutine(StartGame());
@@ -20,7 +22,7 @@ public class MenuManager : MonoBehaviour
     private IEnumerator StartGame()
     {
         yield return new WaitForSecondsRealtime(1f);
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(startingSceneName);
       
     }
 

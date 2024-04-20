@@ -8,25 +8,23 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform shotOrigin;
     private GameController gameController;
     private bool canShoot = true;
+    private bool playerIsDead = false;
     private Animator animator;
-
-    public bool CanShoot
-    {
-        get => canShoot;
-        set => canShoot = value;
-    }
     
     void Start()
     {
-        canShoot = true;
         gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         animator = GetComponent<Animator>();
     }
 
     void Update()
     {
+        if (playerIsDead)
+        {
+            canShoot = false;
+        }
         // SHOOT INPUTS
-        if (canShoot)
+        if (canShoot == true)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetButtonDown("Jump"))
             {
@@ -50,10 +48,11 @@ public class Player : MonoBehaviour
 
     private IEnumerator Shoot(int bulletIndex)
     {
-        animator.SetTrigger("Shoot");
         canShoot = false;
+        animator.SetTrigger("Shoot");        
+        gameController.PlayPlayerShoots();
         Instantiate(bullets[bulletIndex], shotOrigin.position, bullets[bulletIndex].transform.rotation);
-        yield return new WaitForSeconds(.25f);
+        yield return new WaitForSeconds(.1f);
         canShoot = true;
     }
 
@@ -61,16 +60,20 @@ public class Player : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            StartCoroutine(PlayerDies());
+            if (!playerIsDead)
+            {
+                PlayerDies();
+            }
+           
         }
     }
 
-    private IEnumerator PlayerDies()
+    private void PlayerDies()
     {
-        yield return new WaitForSeconds(0.01f);
-        
-        canShoot = false;
+        gameController.SaveGameData();
+        playerIsDead = true;
+        gameController.PlayPlayerDies();     
         animator.SetTrigger("Die");
-        gameController.StartCoroutine(gameController.ReloadScene());     
+        gameController.StartCoroutine(gameController.ReloadScene());
     } 
 }
