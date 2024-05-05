@@ -1440,7 +1440,8 @@ MonoBehaviour:
   playerData:
     uID: 
     userName: 
-    completedLevels: []
+    availableLevels: []
+  dataFound: 0
 --- !u!4 &462194612
 Transform:
   m_ObjectHideFlags: 0
@@ -6517,6 +6518,7 @@ MonoBehaviour:
   inputNameUI: {fileID: 790305379}
   resetEmail: {fileID: 1858506388}
   inputName: {fileID: 851264912}
+  homeSceneName: MainMenu
 --- !u!4 &1541540049
 Transform:
   m_ObjectHideFlags: 0

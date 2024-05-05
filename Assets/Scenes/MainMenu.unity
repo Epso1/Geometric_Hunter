@@ -435,7 +435,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a395e9ca6b6ef94892bb1b69478a862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingSceneName: Scene01
+  startingSceneName: LevelSelectionScene
 --- !u!1 &1062406334
 GameObject:
   m_ObjectHideFlags: 0
@@ -768,6 +768,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1211148970}
   m_CullTransparentMesh: 1
+--- !u!1 &1239919652
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1239919654}
+  - component: {fileID: 1239919653}
+  m_Layer: 0
+  m_Name: DataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1239919653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239919652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d56888d271c276740aff640640894e03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    uID: 
+    userName: 
+    availableLevels: []
+  dataFound: 0
+--- !u!4 &1239919654
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239919652}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1654744155
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,3 +1442,4 @@ SceneRoots:
   - {fileID: 2123999668}
   - {fileID: 1062406337}
   - {fileID: 635890807}
+  - {fileID: 1239919654}

@@ -9,6 +9,7 @@ public class DataManager : MonoBehaviour
 {
     public PlayerData playerData;
     public DatabaseReference dbRef;
+    public bool dataFound;
 
     public static DataManager Instance;
 
@@ -26,14 +27,6 @@ public class DataManager : MonoBehaviour
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
     }
 
-
-    public void SavePlayerData(string uID, string name)
-    {
-        playerData = new PlayerData(uID, name);
-        string json = JsonUtility.ToJson(playerData);
-        dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
-        UnityEngine.Debug.Log("Los datos se guardaron correctamente.");
-    }
 
     public void LoadPlayerData(string uID)
     {
@@ -63,84 +56,54 @@ public class DataManager : MonoBehaviour
         }
 
     }
+
+
+    public void SavePlayerData(PlayerData playerData)
+    {
+        dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+        string uID = playerData.uID;       
+        string json = JsonUtility.ToJson(playerData);
+        dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
+        UnityEngine.Debug.Log("Los datos se guardaron correctamente.");
+    }
+
     public void CreatePlayerData(string uID, string name)
     {
+        dbRef = FirebaseDatabase.DefaultInstance.RootReference;
         playerData = new PlayerData(uID, name);
         string json = JsonUtility.ToJson(playerData);
         dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
         UnityEngine.Debug.Log("Los datos se crearon correctamente.");
-
     }
 
-    public int UserExists(string uID)
+    public void CheckPlayerData(string uID)
     {
-        int result = 1;
-        // Consultar si el uID existe en la base de datos
-        dbRef.Child("users").OrderByChild("uID").EqualTo(uID).GetValueAsync().ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                result = 1;
-            }
-            else if (task.IsCompleted)
-            {
-                DataSnapshot snapshot = task.Result;
-                if (snapshot.Exists)
-                {
-                    result = 0;
-                }
-                else
-                {
-                    result = 2;
-                }
-            }
-        });
-        return result;
+        StartCoroutine(CheckPlayerDataEnum(uID));
     }
 
-    public void logUser(string uID)
+    public IEnumerator CheckPlayerDataEnum(string uID)
     {
-        // Consultar si el uID existe en la base de datos
-        dbRef.Child("users").Child(uID).GetValueAsync().ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                Debug.LogError("Error al consultar la base de datos.");
-                return;
-            }
-            else if (task.IsCompleted)
-            {
-                DataSnapshot snapshot = task.Result;
-                if (snapshot.Exists)
-                {
-                    Debug.Log("El usuario con uID " + uID + " existe en la base de datos.");
-                }
-                else
-                {
-                    Debug.Log("El usuario con uID " + uID + " no existe en la base de datos.");
-                }
-            }
-        });
-    }
+        dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+        var serverData = dbRef.Child("users").Child(uID).GetValueAsync();
+        yield return new WaitUntil(predicate: () => serverData.IsCompleted);
 
-    // Método para comprobar si un usuario existe en la base de datos
-    public void CheckIfUserExists(string uID, Action<bool> callback)
-    {
-        dbRef.Child("users").Child(uID).GetValueAsync().ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                Debug.LogError("Error al comprobar la existencia del usuario: " + task.Exception);
-                callback(false);
-            }
-            else if (task.IsCompleted)
-            {
-                DataSnapshot snapshot = task.Result;
-                callback(snapshot.Exists);
-            }
-        });
-    }
+        print("process is complete");
 
+        DataSnapshot snapshot = serverData.Result;
+        string jsonData = snapshot.GetRawJsonValue();
+
+        if (jsonData != null)
+        {
+            dataFound = true;
+            print("server data found");
+        }
+        else
+        {
+            dataFound = false;
+            print("no data found");
+        }
+
+    }
 
 }
 

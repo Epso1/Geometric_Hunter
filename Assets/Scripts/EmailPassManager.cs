@@ -5,6 +5,7 @@ using Firebase.Extensions;
 using Firebase.Auth;
 using Firebase;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
+using UnityEngine.SceneManagement;
 
 public class EmailPassManager : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class EmailPassManager : MonoBehaviour
 
     [Header("Input name")]
     public TMP_InputField inputName;
-
+    public string homeSceneName;
     private string tempUserID;
     #endregion
 
@@ -142,28 +143,9 @@ public class EmailPassManager : MonoBehaviour
                 loginUi.SetActive(false);
                 successTxt.enabled = true;
                 successTxt.text = "SUCCESS!\nId: " + tempUserID;
-                DataManager.Instance.LoadPlayerData(tempUserID);
 
-                inputNameUI.SetActive(true);
+                StartCoroutine(CheckPlayerDataRoutine(tempUserID));    
 
-                //Comprobamos si el usuario existe en la base de datos
-
-                /*
-                if (DataManager.Instance.UserExists(tempUserID) == 0)
-                {
-                    Debug.Log("El usuario con uID " + tempUserID + " existe en la base de datos.");
-                }
-                else if (DataManager.Instance.UserExists(tempUserID) == 2)
-                {
-                    //Si el usuario no existe en la base de datos, se abre la UI de input name
-                    Debug.Log("El usuario con uID " + tempUserID + " no existe en la base de datos.");
-                    inputNameUI.SetActive(true);
-                }
-                else if (DataManager.Instance.UserExists(tempUserID) == 1)
-                {
-                    Debug.LogError("Error al consultar la base de datos.");
-                }
-                */
             }
             else
             {
@@ -208,6 +190,28 @@ public class EmailPassManager : MonoBehaviour
     public void ValidateInputName()
     {
         DataManager.Instance.CreatePlayerData(tempUserID, inputName.text);
+    }
+
+    private IEnumerator CheckPlayerDataRoutine(string tempUserID)
+    {
+        yield return StartCoroutine(DataManager.Instance.CheckPlayerDataEnum(tempUserID));
+
+        // Después de que la corrutina haya terminado, procede con la comprobación
+        if (DataManager.Instance.dataFound == true)
+        {
+            DataManager.Instance.LoadPlayerData(tempUserID);
+            StartCoroutine(LoadHomeScene());
+        }
+        else
+        {
+            inputNameUI.SetActive(true);
+        }
+    }
+
+    private IEnumerator LoadHomeScene()
+    {
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(homeSceneName);
     }
     #endregion
 
