@@ -18,12 +18,7 @@ public class LevelSelector : MonoBehaviour
         PlayerPrefs.SetString("LEVEL4", "UNCOMPLETED");
         PlayerPrefs.SetString("LEVEL5", "UNCOMPLETED");
         PlayerPrefs.SetString("LEVEL6", "UNCOMPLETED");
-        UnityEngine.Debug.Log("LEVEL1: " + PlayerPrefs.GetString("LEVEL1"));
-        UnityEngine.Debug.Log("LEVEL2: " + PlayerPrefs.GetString("LEVEL2"));
-        UnityEngine.Debug.Log("LEVEL3: " + PlayerPrefs.GetString("LEVEL3"));
-        UnityEngine.Debug.Log("LEVEL4: " + PlayerPrefs.GetString("LEVEL4"));
-        UnityEngine.Debug.Log("LEVEL5: " + PlayerPrefs.GetString("LEVEL5"));
-        UnityEngine.Debug.Log("LEVEL6: " + PlayerPrefs.GetString("LEVEL6"));
+
 
         for (int i = 0; i < buttons.Length; i++)
         {

@@ -29,7 +29,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private float playerShootsAudioClipVolume = .6f;
     
     SaveManager saveManager;
-    PlayerData playerData = new PlayerData();
+    
 
     private void Awake()
     {
@@ -48,7 +48,7 @@ public class GameController : MonoBehaviour
        // actualiza el texto del score con el valor actual del score
         scoreText.text = "SCORE: " + ScoreManager.Instance.Score;
         hiScoreText.text = "HI-SCORE: " + ScoreManager.Instance.HiScore;
-
+        /*
         UnityEngine.Debug.Log(playerData.ToString());
 
         if (Input.GetKeyDown(KeyCode.O))
@@ -60,6 +60,7 @@ public class GameController : MonoBehaviour
         {
             SaveGameData();
         }
+        */
     }
 
     private int GetActiveSceneIndex()
@@ -116,7 +117,7 @@ public class GameController : MonoBehaviour
         BGMusicAudioSource.clip = BGMusicAudioClip;
         BGMusicAudioSource.Play();
     }
-
+    /*
     public void SaveGameData()
     {
         // Ejemplo de cómo guardar datos
@@ -132,5 +133,5 @@ public class GameController : MonoBehaviour
     {
         return saveManager.LoadPlayerData();
     }
-
+    */
 }

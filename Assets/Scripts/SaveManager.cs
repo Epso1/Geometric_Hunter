@@ -29,7 +29,7 @@ public class SaveManager : MonoBehaviour
         {
             UnityEngine.Debug.LogWarning("Cannot load player data file");
             // Retorna un nuevo objeto si no hay datos guardados
-            return new PlayerData(); 
+            return null; 
         }
     }
 }

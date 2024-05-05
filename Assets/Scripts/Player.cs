@@ -70,7 +70,7 @@ public class Player : MonoBehaviour
 
     private void PlayerDies()
     {
-        gameController.SaveGameData();
+        //gameController.SaveGameData();
         playerIsDead = true;
         gameController.PlayPlayerDies();     
         animator.SetTrigger("Die");

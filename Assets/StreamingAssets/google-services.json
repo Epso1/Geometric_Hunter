@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1018926682261",
+    "firebase_url": "https://geometric-hunter-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "geometric-hunter",
+    "storage_bucket": "geometric-hunter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018926682261:android:b468f86551d33317da0b9c",
+        "android_client_info": {
+          "package_name": "com.EpsilonInteractive.GeometricHunter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdwuHlgT3KyB273fvfpgv2N64x3ZWyMNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
