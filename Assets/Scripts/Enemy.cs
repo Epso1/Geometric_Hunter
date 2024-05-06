@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum enemyType { Triangle, Square, Circle, Diamond };
+
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private float speed = 10f;
-    public enum enemyType { Triangle, Square, Circle, Diamond };
+    [SerializeField] private float speed = 10f;    
     [SerializeField] private enemyType type;
     [SerializeField] private int pointsRight = 10;
     [SerializeField] private int pointsWrong = 5;

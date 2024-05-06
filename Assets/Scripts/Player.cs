@@ -1,15 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    InputSystem controls;
     [SerializeField] private GameObject[] bullets;
     [SerializeField] private Transform shotOrigin;
     private GameController gameController;
     private bool canShoot = true;
     private bool playerIsDead = false;
     private Animator animator;
+   
+    void Awake()
+    {
+        controls = new InputSystem();
+        controls.Enable();
+        controls.Land.NorthBtn.performed += ctx => ShootTriangle();
+        controls.Land.SouthBtn.performed += ctx => ShootDiamond();
+        controls.Land.WestBtn.performed += ctx => ShootSquare();
+        controls.Land.EastBtn.performed += ctx => ShootCircle();
+
+    }
     
     void Start()
     {
@@ -23,6 +36,7 @@ public class Player : MonoBehaviour
         {
             canShoot = false;
         }
+        /*
         // SHOOT INPUTS
         if (canShoot == true)
         {
@@ -43,17 +57,21 @@ public class Player : MonoBehaviour
                 StartCoroutine(Shoot(1));
             }
         }
+        */
     }
 
 
     private IEnumerator Shoot(int bulletIndex)
     {
-        canShoot = false;
-        animator.SetTrigger("Shoot");        
-        gameController.PlayPlayerShoots();
-        Instantiate(bullets[bulletIndex], shotOrigin.position, bullets[bulletIndex].transform.rotation);
-        yield return new WaitForSeconds(.1f);
-        canShoot = true;
+        if (canShoot)
+        {
+            canShoot = false;
+            animator.SetTrigger("Shoot");
+            gameController.PlayPlayerShoots();
+            Instantiate(bullets[bulletIndex], shotOrigin.position, bullets[bulletIndex].transform.rotation);
+            yield return new WaitForSeconds(.1f);
+            canShoot = true;
+        }        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -76,4 +94,34 @@ public class Player : MonoBehaviour
         animator.SetTrigger("Die");
         gameController.StartCoroutine(gameController.ReloadScene());
     } 
+
+    private void ShootTriangle()
+    {
+        StartCoroutine(Shoot(2));
+    }
+
+    private void ShootSquare()
+    {
+        StartCoroutine(Shoot(0));
+    }
+
+    private void ShootCircle()
+    {
+        StartCoroutine(Shoot(1));
+    }
+
+    private void ShootDiamond()
+    {
+        StartCoroutine(Shoot(3));
+    }
+
+    private void OnEnable()
+    {
+        controls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls.Disable();
+    }
 }

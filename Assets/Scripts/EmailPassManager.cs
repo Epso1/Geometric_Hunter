@@ -190,6 +190,7 @@ public class EmailPassManager : MonoBehaviour
     public void ValidateInputName()
     {
         DataManager.Instance.CreatePlayerData(tempUserID, inputName.text);
+        StartCoroutine(LoadHomeScene());
     }
 
     private IEnumerator CheckPlayerDataRoutine(string tempUserID)
@@ -210,7 +211,7 @@ public class EmailPassManager : MonoBehaviour
 
     private IEnumerator LoadHomeScene()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         SceneManager.LoadScene(homeSceneName);
     }
     #endregion

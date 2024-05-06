@@ -1220,7 +1220,7 @@ MonoBehaviour:
   - {fileID: 1646181032}
   - {fileID: 1136267954}
   - {fileID: 449519625}
-  level01Name: 
+  level01Name: Level01_01
 --- !u!4 &1128330437
 Transform:
   m_ObjectHideFlags: 0
