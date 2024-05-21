@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
-   
-    // Crea un singleton para que el ScoreManager no se destruya al cambiar de escena
+    
     public static ScoreManager Instance;
 
     private int score = 0;
- 
 
     public int Score
     {
@@ -17,7 +16,7 @@ public class ScoreManager : MonoBehaviour
         set => score = value;
     }
 
-    private int hiScore = 50;
+    private int hiScore = 0;
 
     public int HiScore
     {
@@ -36,11 +35,21 @@ public class ScoreManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // Resetear el score cuando se carga el nivel
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
-    // Start is called before the first frame update
+
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        score = 0;
+    }
+
+
     void Start()
     {
-        
+
     }
 
     void Update()
@@ -49,8 +58,8 @@ public class ScoreManager : MonoBehaviour
         {
             score = 0;
         }
-        
-        if (score > hiScore) 
+
+        if (score > hiScore)
         {
             hiScore = score;
         }

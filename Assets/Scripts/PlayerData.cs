@@ -15,7 +15,7 @@ public class PlayerData
         this.userName = name;
         availableLevels = new List<LevelData> ();
         availableLevels.Add(new LevelData(1, 0, false));
-        availableLevels.Add(new LevelData(2, 0, false));
+        availableLevels.Add(new LevelData(2, 0, true));
         availableLevels.Add(new LevelData(3, 0, true));
         availableLevels.Add(new LevelData(4, 0, true));
         availableLevels.Add(new LevelData(5, 0, true));

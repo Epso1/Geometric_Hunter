@@ -27,13 +27,12 @@ public class DataManager : MonoBehaviour
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
     }
 
-
     public void LoadPlayerData(string uID)
     {
-        StartCoroutine(LoadDataEnum(uID));
+        StartCoroutine(LoadPlayerDataEnum(uID));
     }
 
-    IEnumerator LoadDataEnum(string uID)
+    IEnumerator LoadPlayerDataEnum(string uID)
     {
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
         var serverData = dbRef.Child("users").Child(uID).GetValueAsync();
@@ -54,26 +53,36 @@ public class DataManager : MonoBehaviour
         {
             print("no data found");
         }
-
     }
-
 
     public void SavePlayerData(PlayerData playerData)
     {
+        StartCoroutine(SavePlayerDataEnum(playerData));
+    }
+
+    IEnumerator SavePlayerDataEnum(PlayerData playerData)
+    {
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
-        string uID = playerData.uID;       
+        string uID = playerData.uID;
         string json = JsonUtility.ToJson(playerData);
-        dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
-        UnityEngine.Debug.Log("Los datos se guardaron correctamente.");
+        var task = dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
+        yield return new WaitUntil(() => task.IsCompleted);
+        UnityEngine.Debug.Log("Data saved.");
     }
 
     public void CreatePlayerData(string uID, string name)
     {
+        StartCoroutine(CreatePlayerDataEnum(uID, name));
+    }
+
+    IEnumerator CreatePlayerDataEnum(string uID, string name)
+    {
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
         playerData = new PlayerData(uID, name);
         string json = JsonUtility.ToJson(playerData);
-        dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
-        UnityEngine.Debug.Log("Los datos se crearon correctamente.");
+        var task = dbRef.Child("users").Child(uID).SetRawJsonValueAsync(json);
+        yield return new WaitUntil(() => task.IsCompleted);
+        UnityEngine.Debug.Log("Data created.");
     }
 
     public void CheckPlayerData(string uID)
@@ -102,8 +111,45 @@ public class DataManager : MonoBehaviour
             dataFound = false;
             print("no data found");
         }
-
     }
 
-}
+    public void UpdateLevelStars(int levelIndexToUpdateStars, int newStarsEarned)
+    {
+        // Busca el nivel con el índice especificado
+        foreach (LevelData level in playerData.availableLevels)
+        {
+            if (level.levelIndex == levelIndexToUpdateStars)
+            {
+                // Solo actualiza las estrellas si newStarsEarned es mayor que las estrellas actuales
+                if (newStarsEarned > level.starsEarned)
+                {
+                    level.starsEarned = newStarsEarned;
+                }
+                break; // Una vez que se ha actualizado, sal del bucle
+            }
+        }
 
+        // Guarda los cambios actualizados en la base de datos
+        SavePlayerData(playerData);
+    }
+
+    public void UnlockLevel(int levelIndexToUpdateLock)
+    {
+        // Busca el nivel con el índice especificado
+        foreach (LevelData level in playerData.availableLevels)
+        {
+            if (level.levelIndex == levelIndexToUpdateLock)
+            {
+                // Solo actualiza isLocked si el nivel está bloqueado
+                if (level.isLocked)
+                {
+                    level.isLocked = false;
+                }
+                break; // Una vez que se ha actualizado, sal del bucle
+            }
+        }
+
+        // Guarda los cambios actualizados en la base de datos
+        SavePlayerData(playerData);
+    }
+}

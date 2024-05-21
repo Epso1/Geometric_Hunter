@@ -9,12 +9,18 @@ using System.Diagnostics;
 
 public class GameController : MonoBehaviour
 {
+    #region variables
+    [Header("UI")]
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI hiScoreText;
-    [SerializeField] private float timeToReloadScene = 3f;
+    [SerializeField] private TextMeshProUGUI waveInfoText;
+
     [SerializeField] private GameObject imageFadeIn;
     [SerializeField] private GameObject imageFadeOut;
+    [SerializeField] private float timeToReloadScene = 3f;    
     [SerializeField] private float fadeDuration = 1f;
+
+    [Header("Audio")]
     [SerializeField] private AudioSource soundFXAudioSource;
     [SerializeField] private AudioSource BGMusicAudioSource;
     [SerializeField] private AudioClip goodShotAudioClip;
@@ -23,13 +29,32 @@ public class GameController : MonoBehaviour
     [SerializeField] private float badShotAudioClipVolume= .6f;
     [SerializeField] private AudioClip BGMusicAudioClip;
     [SerializeField] private float BGMusicAudioClipVolume = .6f;
+    [SerializeField] private AudioClip victoryMusicAudioClip;
+    [SerializeField] private float victoryAudioClipVolume = .6f;
     [SerializeField] private AudioClip playerDiesAudioClip;
     [SerializeField] private float playerDiesAudioClipVolume = .6f;
     [SerializeField] private AudioClip playerShootsAudioClip;
     [SerializeField] private float playerShootsAudioClipVolume = .6f;
-    
-    SaveManager saveManager;
-    
+
+    [Header("Level Config")]
+    [SerializeField] private int levelIndex = 1;
+    [SerializeField] private String mainMenuSceneName;
+    [SerializeField] private Animator cameraAnimator;
+    [SerializeField] private EnemiesCreator enemiesCreator;
+    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject victoryMessage;
+    [SerializeField] private float levelCompletedWait = 8f;
+    [SerializeField] private string levelSelectionSceneName;
+    [SerializeField] private int levelIndexToUnlock = 2;
+    [SerializeField] private int topScore = 300;
+    [SerializeField] private int medScore = 200;
+    [SerializeField] private float afterCheckWait = 2f;
+
+
+    private bool levelCompleted = false;
+    private SaveManager saveManager;
+    #endregion
+
 
     private void Awake()
     {
@@ -40,49 +65,128 @@ public class GameController : MonoBehaviour
     {
         imageFadeIn.SetActive(true);
         PlayBGMusic();
+        victoryMessage.SetActive(false);
+        StartCoroutine(CheckLevelFinished());
        
     }
 
     void Update()
     {
-       // actualiza el texto del score con el valor actual del score
         scoreText.text = "SCORE: " + ScoreManager.Instance.Score;
         hiScoreText.text = "HI-SCORE: " + ScoreManager.Instance.HiScore;
-        /*
-        UnityEngine.Debug.Log(playerData.ToString());
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (levelCompleted == true)
         {
-            playerData = LoadGameData();
+            levelCompleted = false;
+            StartCoroutine(LevelCompleted());
         }
 
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            SaveGameData();
-        }
-        */
     }
 
-    private int GetActiveSceneIndex()
+    public IEnumerator LevelCompleted()
     {
-        return SceneManager.GetActiveScene().buildIndex;
+        PlayVictoryMusic();
+        victoryMessage.SetActive(true);
+        player.GetComponent<Animator>().SetTrigger("Win");
+        cameraAnimator.SetTrigger("Win");
+        
+        DataManager.Instance.UnlockLevel(levelIndexToUnlock);
+
+        if (ScoreManager.Instance.Score >= topScore)
+        {
+            DataManager.Instance.UpdateLevelStars(levelIndex, 3);
+        }
+        else if (ScoreManager.Instance.Score < topScore && ScoreManager.Instance.Score >= medScore)
+        {
+            DataManager.Instance.UpdateLevelStars(levelIndex, 2);
+        }
+        else
+        {
+            DataManager.Instance.UpdateLevelStars(levelIndex, 1);
+        }
+
+        yield return new WaitForSeconds(levelCompletedWait);
+        imageFadeOut.SetActive(true);
+        yield return new WaitForSeconds(fadeDuration);
+        SceneManager.LoadScene(levelSelectionSceneName);
+
+    }
+
+    public IEnumerator CheckLevelFinished()
+    {
+        yield return StartCoroutine(enemiesCreator.CreateEnemies());
+        yield return new WaitForSeconds(afterCheckWait);
+        levelCompleted = true;
     }
  
-    public IEnumerator LoadNextScene()
-    {
-        yield return new WaitForSeconds(1f);
-        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex + 1);
-    }
-
     public IEnumerator ReloadScene()
     {
+        cameraAnimator.SetTrigger("Die");
         yield return new WaitForSeconds(timeToReloadScene);
         imageFadeOut.SetActive(true);
         yield return new WaitForSeconds(fadeDuration);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    public void Restart()
+    {
+        Time.timeScale = 1f;
+        StartCoroutine(RestartScene());
+    }
+
+    public IEnumerator RestartScene()
+    {
+        imageFadeOut.SetActive(true);
+        yield return new WaitForSeconds(fadeDuration);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void BackToMainMenu()
+    {
+        Time.timeScale = 1f;
+        StartCoroutine(LoadMainMenuScene());
+    }
+
+    public IEnumerator LoadMainMenuScene()
+    {
+        imageFadeOut.SetActive(true);
+        yield return new WaitForSeconds(fadeDuration);
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
+    public void Pause()
+    {
+        Time.timeScale = 0f;
+        AudioSource[] audioSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+
+        foreach (AudioSource aSource in audioSources)
+        {
+            aSource.Pause();
+        }
+    }
+
+    public void Resume()
+    {
+        Time.timeScale = 1f;
+        AudioSource[] audioSources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+
+        foreach (AudioSource aSource in audioSources)
+        {
+            aSource.UnPause();
+        }
+    }
+    public void SetWaveInfoText(string newText)
+    {
+        StartCoroutine(SetWaveInfoTextEnum(newText));
+    }
+
+    public IEnumerator SetWaveInfoTextEnum(string newText)
+    {
+        waveInfoText.gameObject.SetActive(true);
+        waveInfoText.text = newText;
+        yield return new WaitForSeconds(enemiesCreator.waveInfoTextTime);
+        waveInfoText.gameObject.SetActive(false);
+    }
     public void PlayGoodShot()
     {
         soundFXAudioSource.volume = goodShotAudioClipVolume;
@@ -117,21 +221,17 @@ public class GameController : MonoBehaviour
         BGMusicAudioSource.clip = BGMusicAudioClip;
         BGMusicAudioSource.Play();
     }
-    /*
-    public void SaveGameData()
-    {
-        // Ejemplo de cómo guardar datos
-        PlayerData playerData = new PlayerData();   
-        playerData.userName = "EjemploUsuario";
-        playerData.completedLevels.Add(new LevelData(1, 3)); // Nivel 1 completado con 3 estrellas
-        playerData.completedLevels.Add(new LevelData(2, 2)); // Nivel 2 completado con 2 estrellas
 
-        saveManager.SavePlayerData(playerData);
+    public void StopBGMusic()
+    {
+        BGMusicAudioSource.Stop();
     }
 
-    public PlayerData LoadGameData()
+
+    public void PlayVictoryMusic()
     {
-        return saveManager.LoadPlayerData();
+        BGMusicAudioSource.volume = victoryAudioClipVolume;
+        BGMusicAudioSource.clip = victoryMusicAudioClip;
+        BGMusicAudioSource.Play();
     }
-    */
 }

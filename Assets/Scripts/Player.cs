@@ -90,7 +90,8 @@ public class Player : MonoBehaviour
     {
         //gameController.SaveGameData();
         playerIsDead = true;
-        gameController.PlayPlayerDies();     
+        gameController.PlayPlayerDies();
+        gameController.StopBGMusic();
         animator.SetTrigger("Die");
         gameController.StartCoroutine(gameController.ReloadScene());
     } 

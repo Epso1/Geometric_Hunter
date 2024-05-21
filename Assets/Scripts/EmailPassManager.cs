@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using System;
 using Firebase.Extensions;
 using Firebase.Auth;
 using Firebase;
@@ -17,12 +18,14 @@ public class EmailPassManager : MonoBehaviour
     [Header("Sign up")]
     public TMP_InputField signUpEmail;
     public TMP_InputField signUpPassword;
-    public TMP_InputField signUpPasswordConfirm;
 
     [Header("Extra")]
     public GameObject loadingScreen;
-    public TextMeshProUGUI logTxt, successTxt;
-    public GameObject loginUi, signupUi, inputNameUI;
+    public TextMeshProUGUI logTxt;
+    public GameObject loginUi, signupUi, inputNameUI, checkEmailUI, resetPasswordUI;
+    [SerializeField] private GameObject imageFadeOut;
+    [SerializeField] private GameObject imageFadeIn;
+    [SerializeField] private float fadeDuration = 1.0f;
 
     [Header("Reset pass")]
     public TMP_InputField resetEmail;
@@ -30,8 +33,15 @@ public class EmailPassManager : MonoBehaviour
     [Header("Input name")]
     public TMP_InputField inputName;
     public string homeSceneName;
+
     private string tempUserID;
+    private string tempUserEmail;
     #endregion
+
+    void Start()
+    {
+        imageFadeIn.SetActive(true);
+    }
 
     #region signup 
     public void SignUp()
@@ -44,16 +54,42 @@ public class EmailPassManager : MonoBehaviour
         auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task => {
             if (task.IsCanceled)
             {
+                loadingScreen.SetActive(false);
                 Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
+                showLogMsg("User creation was cancelled.");
                 return;
             }
             if (task.IsFaulted)
             {
+                loadingScreen.SetActive(false);
                 Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+
+                foreach (Exception e in task.Exception.InnerExceptions)
+                {
+                    Firebase.FirebaseException firebaseEx = e as Firebase.FirebaseException;
+                    if (firebaseEx != null)
+                    {
+                        switch ((AuthError)firebaseEx.ErrorCode)
+                        {
+                            case AuthError.EmailAlreadyInUse:
+                                showLogMsg("User already exists.");
+                                break;
+                            case AuthError.WeakPassword:
+                                showLogMsg("Weak password. Please choose a stronger password.");
+                                break;
+                            case AuthError.NetworkRequestFailed:
+                                showLogMsg("Connection lost. Please check your internet connection.");
+                                break;
+                            default:
+                                showLogMsg("An error occurred: " + firebaseEx.Message);
+                                break;
+                        }
+                    }
+                }
                 return;
             }
-            // Firebase user has been created.
 
+ 
             loadingScreen.SetActive(false);
             AuthResult result = task.Result;
             Debug.LogFormat("Firebase user created successfully: {0} ({1})",
@@ -61,7 +97,6 @@ public class EmailPassManager : MonoBehaviour
 
             signUpEmail.text = "";
             signUpPassword.text = "";
-            signUpPasswordConfirm.text = "";
 
             if (result.User.IsEmailVerified)
             {
@@ -69,7 +104,6 @@ public class EmailPassManager : MonoBehaviour
             }
             else
             {
-                showLogMsg("Please verify your email!");
                 SendEmailVerification();
             }
 
@@ -93,14 +127,55 @@ public class EmailPassManager : MonoBehaviour
             if (sendEmailTask.Exception != null)
             {
                 print("Email send error");
+                showLogMsg("Email send error!");
             }
             else
             {
                 print("Email successfully send");
+                showLogMsg("Email successfully send!");
+                signupUi.SetActive(false);
+                checkEmailUI.SetActive(true);
             }
         }
     }
+    public void SendPasswordResetEmail()
+    {
+        StartCoroutine(SendPasswordResetEmailAsync());
+    }
 
+    IEnumerator SendPasswordResetEmailAsync()
+    {
+        FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+        FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+        string emailAddress = resetEmail.text;
+        if (user != null)
+        {
+            var sendEmailTask = auth.SendPasswordResetEmailAsync(emailAddress);
+            yield return new WaitUntil(() => sendEmailTask.IsCompleted);
+
+            if (sendEmailTask.Exception != null)
+            {
+                string errorMessage = "Email send error: " + sendEmailTask.Exception.ToString();
+                print(errorMessage);
+                if (errorMessage.Contains("badly formatted"))
+                {
+                    showLogMsg("Email badly formatted!");
+                }
+                else
+                {
+                    showLogMsg("Email send error!");
+                }
+              
+            }
+            else
+            {
+                print("Email successfully send");
+                showLogMsg("Password reset email sent successfully.");
+                checkEmailUI.SetActive(true);
+                resetPasswordUI.SetActive(false);
+            }
+        }
+    }
 
     #endregion
 
@@ -119,14 +194,14 @@ public class EmailPassManager : MonoBehaviour
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInAndRetrieveDataWithCredentialAsync was canceled.");
-                logTxt.text = "Invalid email or password, please try again.";
+                showLogMsg("Invalid email or password, please try again.");
                 loadingScreen.SetActive(false);
                 return;
             }
             if (task.IsFaulted)
             {
                 Debug.LogError("SignInAndRetrieveDataWithCredentialAsync encountered an error: " + task.Exception);
-                logTxt.text = "Invalid email or password, please try again.";
+                showLogMsg("Invalid email or password, please try again.");
                 loadingScreen.SetActive(false);
                 return;
             }
@@ -137,13 +212,11 @@ public class EmailPassManager : MonoBehaviour
 
             if (result.User.IsEmailVerified)
             {
-                showLogMsg("Log in Successful");
-
                 tempUserID = result.User.UserId;
+                tempUserEmail = result.User.Email; 
                 loginUi.SetActive(false);
-                successTxt.enabled = true;
-                successTxt.text = "SUCCESS!\nId: " + tempUserID;
-
+                               
+                showLogMsg("Log in successful!");
                 StartCoroutine(CheckPlayerDataRoutine(tempUserID));    
 
             }
@@ -156,7 +229,9 @@ public class EmailPassManager : MonoBehaviour
 
     }
 
-    public void SendPasswordResetEmail()
+   
+
+    public void SendPasswordResetEmail2()
     {
         FirebaseAuth auth = FirebaseAuth.DefaultInstance;
         FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
@@ -167,15 +242,23 @@ public class EmailPassManager : MonoBehaviour
                 if (task.IsCanceled)
                 {
                     Debug.LogError("SendPasswordResetEmailAsync was canceled.");
+                    showLogMsg("Send password reset email was canceled.");
                     return;
                 }
                 if (task.IsFaulted)
                 {
                     Debug.LogError("SendPasswordResetEmailAsync encountered an error: " + task.Exception);
+                    showLogMsg("Send password reset email encountered an error.");
                     return;
                 }
-
+                
                 Debug.Log("Password reset email sent successfully.");
+                checkEmailUI.SetActive(true);
+                resetPasswordUI.SetActive(false);
+                showLogMsg("Password reset email sent successfully.");
+               
+                
+                
             });
         }
     }
@@ -211,8 +294,36 @@ public class EmailPassManager : MonoBehaviour
 
     private IEnumerator LoadHomeScene()
     {
-        yield return new WaitForSeconds(1f);
+        imageFadeOut.SetActive(true);
+        yield return new WaitForSeconds(fadeDuration);
         SceneManager.LoadScene(homeSceneName);
+    }
+    public void EraseLogTxt()
+    {
+        logTxt.text = "";
+    }
+
+    private IEnumerator EraseLogText(float wait)
+    {
+        yield return new WaitForSeconds(wait);
+        logTxt.text = "";
+
+    }
+    public void EraseLogInInputs()
+    {
+        loginEmail.text = "";
+        loginPassword.text = "";
+    }
+
+    public void ExitGame()
+    {
+        StartCoroutine(ExitGameEnum());
+    }
+
+    private IEnumerator ExitGameEnum()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+        Application.Quit();
     }
     #endregion
 

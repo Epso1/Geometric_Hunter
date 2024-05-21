@@ -1,38 +1,24 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using System.Collections;
+using System;
 
 public class LevelSelector : MonoBehaviour
 {
+    [SerializeField] private List<LevelButtonSet> levelButtonSets; // Lista de objetos que contienen botón de nivel y estrellas
+    [SerializeField] private string[] levelNames;
+    [SerializeField] private GameObject imageFadeOut;
+    [SerializeField] private GameObject imageFadeIn;
+    [SerializeField] private float fadeDuration = 1f;
+    [SerializeField] private string mainMenuSceneName;
 
-    [SerializeField] private Button[] buttons;
-    [SerializeField] private string level01Name;
     void Start()
-
     {
-        /*
-        PlayerPrefs.SetString("LEVEL1", "COMPLETED");
-        PlayerPrefs.SetString("LEVEL2", "COMPLETED");
-        PlayerPrefs.SetString("LEVEL3", "UNCOMPLETED");
-        PlayerPrefs.SetString("LEVEL4", "UNCOMPLETED");
-        PlayerPrefs.SetString("LEVEL5", "UNCOMPLETED");
-        PlayerPrefs.SetString("LEVEL6", "UNCOMPLETED");
-
-
-        for (int i = 0; i < buttons.Length; i++)
-        {
-            string levelName = "LEVEL" + (i +1).ToString();
-            if (!PlayerPrefs.GetString(levelName).Equals("COMPLETED"))
-            {
-            //buttons[i].enabled = false;
-            buttons[i].interactable = false;
-            }
-        }
-        */
+        imageFadeIn.SetActive(true);
         DataManager dataManager = DataManager.Instance;
         if (dataManager != null && dataManager.playerData != null)
         {
@@ -40,7 +26,7 @@ public class LevelSelector : MonoBehaviour
             PlayerData playerData = dataManager.playerData;
 
             // Iterar sobre los botones y habilitarlos o deshabilitarlos según los niveles desbloqueados
-            for (int i = 0; i < buttons.Length; i++)
+            for (int i = 0; i < levelButtonSets.Count; i++)
             {
                 int levelIndex = i + 1;
 
@@ -49,11 +35,26 @@ public class LevelSelector : MonoBehaviour
 
                 if (levelData != null && !levelData.isLocked)
                 {
-                    buttons[i].interactable = true; // Habilitar el botón si el nivel está desbloqueado
+                    levelButtonSets[i].levelButton.interactable = true; // Habilitar el botón si el nivel está desbloqueado
+                    levelButtonSets[i].lockImage.gameObject.SetActive(false); // Desactivar la imagen del candado
+
+                    // Activar los botones de estrellas según la cantidad de estrellas ganadas en el nivel
+                    int starsEarned = levelData.starsEarned;
+                    for (int j = 0; j < levelButtonSets[i].starImages.Length; j++)
+                    {
+                        levelButtonSets[i].starImages[j].gameObject.SetActive(j < starsEarned);
+                    }
                 }
                 else
                 {
-                    buttons[i].interactable = false; // Deshabilitar el botón si el nivel está bloqueado
+                    levelButtonSets[i].levelButton.interactable = false; // Deshabilitar el botón si el nivel está bloqueado
+                    levelButtonSets[i].levelButton.GetComponentInChildren<TMP_Text>().text = ""; // Borrar el texto del botón
+                    levelButtonSets[i].lockImage.gameObject.SetActive(true); // Activar la imagen del candado
+                    // Activar los botones de estrellas según la cantidad de estrellas ganadas en el nivel                 
+                    for (int j = 0; j < levelButtonSets[i].starImages.Length; j++)
+                    {
+                        levelButtonSets[i].starImages[j].gameObject.SetActive(false);
+                    }
                 }
             }
         }
@@ -61,8 +62,31 @@ public class LevelSelector : MonoBehaviour
 
     public void LoadLevel01()
     {
-        SceneManager.LoadScene(level01Name);
+        StartCoroutine(LoadLevel(levelNames[0]));
     }
 
-        
+    public void LoadLevel02()
+    {
+        StartCoroutine(LoadLevel(levelNames[1]));
+    }
+
+    public IEnumerator LoadLevel(string levelName)
+    {
+        imageFadeOut.SetActive(true);
+        yield return new WaitForSeconds(fadeDuration);
+        SceneManager.LoadScene(levelName);
+    }
+
+    public void BackToMainMenu()
+    {
+        StartCoroutine(LoadMainMenuScene());
+    }
+
+    public IEnumerator LoadMainMenuScene()
+    {
+        imageFadeOut.SetActive(true);
+        yield return new WaitForSeconds(fadeDuration);
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
 }

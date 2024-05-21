@@ -5,31 +5,48 @@ using UnityEngine;
 public class EnemiesCreator : MonoBehaviour
 {
     [SerializeField] private GameObject[] enemies;
-    [SerializeField] private float enemySpeed = 10f;
+    [SerializeField] private float enemySpeed = 6f;
     [SerializeField] private float initialWait = 2f;
-    [SerializeField] private float waitTime = 0.75f;
-    [SerializeField] private int enemyQuantity = 100;
+    [SerializeField] private float waitTimeDivider = 20f;
+    [SerializeField] private int wavesNumber = 3;
+    [SerializeField] private int enemiesPerWave = 10;
+    [SerializeField] private float waveWaitTime = 3f;
+    [SerializeField] private float enemySpeedMultiplier = 1.5f;
+    [SerializeField] private GameController gameController;
+    private float waitTime;
+    public float waveInfoTextTime = 5f;
 
 
-    void Start()
-    {
-        StartCoroutine(CreateEnemies());
-    }   
-    
-    void Update()
-    {
-        
-    }
-
-    IEnumerator CreateEnemies()
+    public IEnumerator CreateEnemies()
     {
         yield return new WaitForSeconds(initialWait);
-        for (int i = 0; i < enemyQuantity; i++)
+        waitTime = 1 - (enemySpeed / waitTimeDivider);
+
+        for (int j = 0; j < wavesNumber; j++)
         {
-            int randomInt = Random.Range(0, enemies.Length);
-            GameObject enemy = Instantiate(enemies[randomInt], this.transform.position, Quaternion.identity);
-            enemy.GetComponent<Enemy>().Speed = enemySpeed;   
-            yield return new WaitForSeconds(waitTime);
+            if (j == (wavesNumber - 1))
+            {
+                gameController.SetWaveInfoText("FINAL WAVE\nIS COMING!!!");
+            }
+            else
+            {
+                gameController.SetWaveInfoText("WAVE " + (j + 1) + "\nIS COMING!!!");
+            }
+            
+            yield return new WaitForSeconds(waveInfoTextTime);
+
+            for (int i = 0; i < enemiesPerWave; i++)
+            {
+                int randomInt = Random.Range(0, enemies.Length);
+                GameObject enemy = Instantiate(enemies[randomInt], this.transform.position, Quaternion.identity);
+                enemy.GetComponent<Enemy>().Speed = enemySpeed;
+                yield return new WaitForSeconds(waitTime);
+            }
+
+            yield return new WaitForSeconds(waveWaitTime);
+            enemySpeed *= enemySpeedMultiplier;
+            waitTime = 1 - (enemySpeed / waitTimeDivider);
         }
+        
     }
 }
