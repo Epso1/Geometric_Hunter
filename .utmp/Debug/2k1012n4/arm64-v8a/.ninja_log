@@ -1,3 +1,5 @@
 # ninja log v5
 1	1456	7368014330285690	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	130a50507e7069ad
 1464	2192	7368014334947120	D:/Unity Projects/Geometric_Hunter/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/2k1012n4/obj/arm64-v8a/libswappywrapper.so	81f2964c0093608e
+686	26036	7379867394339622	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	130a50507e7069ad
+26037	37204	7379867499678011	D:/Unity Projects/Geometric_Hunter/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/2k1012n4/obj/arm64-v8a/libswappywrapper.so	81f2964c0093608e
