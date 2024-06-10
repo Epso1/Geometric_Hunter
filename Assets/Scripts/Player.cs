@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
+
 public class Player : MonoBehaviour
 {
     InputSystem controls;
-    [SerializeField] private GameObject[] bullets;
-    [SerializeField] private Transform shotOrigin;
-    private GameController gameController;
-    private bool canShoot = true;
-    private bool playerIsDead = false;
-    private Animator animator;
+    [SerializeField] public GameObject[] bullets;
+    [SerializeField] public Transform shotOrigin;
+    public GameController gameController;
+    public bool canShoot = true;
+    public bool playerIsDead = false;
+    public Animator animator;
    
     void Awake()
     {
@@ -61,7 +62,7 @@ public class Player : MonoBehaviour
     }
 
 
-    private IEnumerator Shoot(int bulletIndex)
+    public IEnumerator Shoot(int bulletIndex)
     {
         if (canShoot)
         {
@@ -88,7 +89,6 @@ public class Player : MonoBehaviour
 
     private void PlayerDies()
     {
-        //gameController.SaveGameData();
         playerIsDead = true;
         gameController.PlayPlayerDies();
         gameController.StopBGMusic();
@@ -96,22 +96,22 @@ public class Player : MonoBehaviour
         gameController.StartCoroutine(gameController.ReloadScene());
     } 
 
-    private void ShootTriangle()
+    public void ShootTriangle()
     {
         StartCoroutine(Shoot(2));
     }
 
-    private void ShootSquare()
+    public void ShootSquare()
     {
         StartCoroutine(Shoot(0));
     }
 
-    private void ShootCircle()
+    public void ShootCircle()
     {
         StartCoroutine(Shoot(1));
     }
 
-    private void ShootDiamond()
+    public void ShootDiamond()
     {
         StartCoroutine(Shoot(3));
     }

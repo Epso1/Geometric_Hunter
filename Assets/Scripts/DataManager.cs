@@ -60,7 +60,7 @@ public class DataManager : MonoBehaviour
         StartCoroutine(SavePlayerDataEnum(playerData));
     }
 
-    IEnumerator SavePlayerDataEnum(PlayerData playerData)
+    public IEnumerator SavePlayerDataEnum(PlayerData playerData)
     {
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
         string uID = playerData.uID;
@@ -75,7 +75,7 @@ public class DataManager : MonoBehaviour
         StartCoroutine(CreatePlayerDataEnum(uID, name));
     }
 
-    IEnumerator CreatePlayerDataEnum(string uID, string name)
+    public IEnumerator CreatePlayerDataEnum(string uID, string name)
     {
         dbRef = FirebaseDatabase.DefaultInstance.RootReference;
         playerData = new PlayerData(uID, name);

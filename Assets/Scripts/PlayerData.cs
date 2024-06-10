@@ -30,7 +30,7 @@ public class PlayerData
 
         foreach (LevelData level in availableLevels)
         {
-            userDataString += "- Level " + level.levelIndex + " - Stars: " + level.starsEarned + "\n";
+            userDataString += "- Level " + level.levelIndex + " - Stars: " + level.starsEarned + " - Locked: " + level.isLocked + "\n";
         }
 
         return userDataString;
