@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private GameObject imageFadeIn;
     [SerializeField] private GameObject imageFadeOut;
-    [SerializeField] private float timeToReloadScene = 3f;    
+    [SerializeField] private float timeToReloadScene = 3f;
     [SerializeField] private float fadeDuration = 1f;
 
     [Header("Audio")]
@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private AudioClip goodShotAudioClip;
     [SerializeField] private float goodShotAudioClipVolume = .8f;
     [SerializeField] private AudioClip badShotAudioClip;
-    [SerializeField] private float badShotAudioClipVolume= .6f;
+    [SerializeField] private float badShotAudioClipVolume = .6f;
     [SerializeField] private AudioClip BGMusicAudioClip;
     [SerializeField] private float BGMusicAudioClipVolume = .6f;
     [SerializeField] private AudioClip victoryMusicAudioClip;
@@ -50,9 +50,9 @@ public class GameController : MonoBehaviour
     [SerializeField] private int medScore = 200;
     [SerializeField] private float afterCheckWait = 2f;
 
-
     private bool levelCompleted = false;
     private SaveManager saveManager;
+
     #endregion
 
 
@@ -67,7 +67,7 @@ public class GameController : MonoBehaviour
         PlayBGMusic();
         victoryMessage.SetActive(false);
         StartCoroutine(CheckLevelFinished());
-       
+
     }
 
     void Update()
@@ -89,7 +89,7 @@ public class GameController : MonoBehaviour
         victoryMessage.SetActive(true);
         player.GetComponent<Animator>().SetTrigger("Win");
         cameraAnimator.SetTrigger("Win");
-        
+
         DataManager.Instance.UnlockLevel(levelIndexToUnlock);
 
         if (ScoreManager.Instance.Score >= topScore)
@@ -116,9 +116,15 @@ public class GameController : MonoBehaviour
     {
         yield return StartCoroutine(enemiesCreator.CreateEnemies());
         yield return new WaitForSeconds(afterCheckWait);
-        levelCompleted = true;
+        if (player != null)
+        {
+            if (!player.GetComponent<Player>().playerIsDead)
+            {
+                levelCompleted = true;
+            }
+        }
     }
- 
+
     public IEnumerator ReloadScene()
     {
         cameraAnimator.SetTrigger("Die");

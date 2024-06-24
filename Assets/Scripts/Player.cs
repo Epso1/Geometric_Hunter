@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform shotOrigin;
     private GameController gameController;
     private bool canShoot = true;
-    private bool playerIsDead = false;
+    [HideInInspector] public bool playerIsDead = false;
     private Animator animator;
    
     void Awake()

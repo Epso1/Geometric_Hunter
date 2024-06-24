@@ -15,7 +15,23 @@ public class EnemiesCreator : MonoBehaviour
     [SerializeField] private GameController gameController;
     private float waitTime;
     public float waveInfoTextTime = 5f;
+    private Player player; 
 
+    void Start()
+    {
+        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+    }
+
+    void Update()
+    {
+        if (player != null)
+        {
+            if (player.playerIsDead)
+            {
+                StopAllCoroutines();
+            }
+        }
+    }
 
     public IEnumerator CreateEnemies()
     {
